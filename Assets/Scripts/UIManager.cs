@@ -25,7 +25,7 @@ public class UIManager : MonoBehaviour {
 
 	private int firstObj;
 	private int secondObj;
-	private bool itemDragged = false;
+	private bool itemDragged;
 
 
 
@@ -33,7 +33,7 @@ public class UIManager : MonoBehaviour {
 	{
 		//image0 is invisible image just to fill slot and start main array from 1, not 0
 		image = new GameObject[6]  {image0, image1, image2, image3, image4, image5 };
-		shadow = new GameObject[6]  {image0, shadow1, shadow2, shadow3, shadow4, shadow5 };
+		shadow = new GameObject[6]  {image0, shadow5, shadow4, shadow3, shadow2, shadow1 };
 		getImagePos ();
 		swapShadowOrder ();
 	}
@@ -67,55 +67,30 @@ public class UIManager : MonoBehaviour {
 
 		if (!Input.GetMouseButton (0))
 		{
-			image[1].transform.position = Vector3.MoveTowards ( image[1].transform.position, defPos[1], 10f);
-			image[2].transform.position = Vector3.MoveTowards ( image[2].transform.position, defPos[2], 10f);
-			image[3].transform.position = Vector3.MoveTowards ( image[3].transform.position, defPos[3], 10f);
-			image[4].transform.position = Vector3.MoveTowards ( image[4].transform.position, defPos[4], 10f);
-			image[5].transform.position = Vector3.MoveTowards ( image[5].transform.position, defPos[5], 10f);
+			for (int i = 1; i < 6; i++)
+				image[i].transform.position = Vector3.MoveTowards ( image[i].transform.position, defPos[i], 10f);
 		}
 
-		matchCheck ();
+		matchCheck (); //finish if shadowOrder and matrOrder are equal
 
 	}
 
 	//compare MousePos with DefPos and return number of DefPos if any nearby
 	int calculatePosition ()
 	{
-		if 		(Mathf.Abs (Input.mousePosition.x - defPos [1].x) < 50 &&
-		      	 Mathf.Abs (Input.mousePosition.y - defPos [1].y) < 50)
-			return 1;
-		else if (Mathf.Abs (Input.mousePosition.x - defPos [2].x) < 50 &&
-		         Mathf.Abs (Input.mousePosition.y - defPos [2].y) < 50)
-			return 2;
-		else if (Mathf.Abs (Input.mousePosition.x - defPos [3].x) < 50 &&
-		         Mathf.Abs (Input.mousePosition.y - defPos [3].y) < 50)
-			return 3;
-		else if (Mathf.Abs (Input.mousePosition.x - defPos [4].x) < 50 &&
-		         Mathf.Abs (Input.mousePosition.y - defPos [4].y) < 50)
-			return 4;
-		else if (Mathf.Abs (Input.mousePosition.x - defPos [5].x) < 50 &&
-		         Mathf.Abs (Input.mousePosition.y - defPos [5].y) < 50)
-			return 5;
-		else
-			return 0;
-
+		for (int i = 1; i < 6; i++)
+			if (Mathf.Abs (Input.mousePosition.x - defPos [i].x) < 50 &&
+				Mathf.Abs (Input.mousePosition.y - defPos [i].y) < 50)
+				return i;
+		return 0;
 	}
 
 	void getImagePos()
 	{
-		defPos[0] = image[0].transform.position;
-		defPos[1] = image[1].transform.position;
-		defPos[2] = image[2].transform.position;
-		defPos[3] = image[3].transform.position;
-		defPos[4] = image[4].transform.position;
-		defPos[5] = image[5].transform.position;
-
-		shadPos[0] = shadow[0].transform.position;
-		shadPos[1] = shadow[1].transform.position;
-		shadPos[2] = shadow[2].transform.position;
-		shadPos[3] = shadow[3].transform.position;
-		shadPos[4] = shadow[4].transform.position;
-		shadPos[5] = shadow[5].transform.position;
+		for (int i = 0; i < 6; i++) {
+			defPos[i] = image[i].transform.position;
+			shadPos[i] = shadow[i].transform.position;
+		}
 	}
 
 	void swapPoses(int v1, int v2)
@@ -140,30 +115,19 @@ public class UIManager : MonoBehaviour {
 			shadPos [itemToSwap] = shadPos[itemToSwapWith];
 			shadPos [itemToSwapWith] = shadPos[0];
 
-			// order must be counted from other side AND I DONT KNOW WHY
-			itemToSwap = 6 - itemToSwap;
-			itemToSwapWith = 6 - itemToSwapWith;
-
 			shadowOrder [0] = shadowOrder[itemToSwap];
 			shadowOrder [itemToSwap] = shadowOrder[itemToSwapWith];
 			shadowOrder [itemToSwapWith] = shadowOrder[0];
 		}
-		shadow[1].transform.position = Vector3.MoveTowards ( shadow[1].transform.position, shadPos[1], 1000f);
-		shadow[2].transform.position = Vector3.MoveTowards ( shadow[2].transform.position, shadPos[2], 1000f);
-		shadow[3].transform.position = Vector3.MoveTowards ( shadow[3].transform.position, shadPos[3], 1000f);
-		shadow[4].transform.position = Vector3.MoveTowards ( shadow[4].transform.position, shadPos[4], 1000f);
-		shadow[5].transform.position = Vector3.MoveTowards ( shadow[5].transform.position, shadPos[5], 1000f);
-
+		for (int i = 1; i < 6; i++) //swap shadows to new positions
+			shadow[i].transform.position = Vector3.MoveTowards ( shadow[i].transform.position, shadPos[i], 1000f);
 	}
 
 	void matchCheck ()
 	{
-		if (matrOrder [1] == shadowOrder [1] &&
-		    matrOrder [2] == shadowOrder [2] &&
-		    matrOrder [3] == shadowOrder [3] &&
-		    matrOrder [4] == shadowOrder [4] &&
-		    matrOrder [5] == shadowOrder [5])
-			image[0].transform.position = Vector3.MoveTowards ( image[0].transform.position, defPos[1], 10f);
+		for (int i = 1; i < 6; i++)
+			if (matrOrder [i] != shadowOrder [i])
+				return;
+		image[0].transform.position = Vector3.MoveTowards ( image[0].transform.position, defPos[1], 10f);
 	}
-
 }
