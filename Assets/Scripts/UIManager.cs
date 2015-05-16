@@ -10,20 +10,32 @@ public class UIManager : MonoBehaviour {
 	public GameObject image4;
 	public GameObject image5;
 
+	public GameObject shadow1;
+	public GameObject shadow2;
+	public GameObject shadow3;
+	public GameObject shadow4;
+	public GameObject shadow5;
+
 	private GameObject[] image;
-	
+	private GameObject[] shadow;
+	private int[] matrOrder = new int[6]  { 0, 1, 2, 3, 4, 5 };
+	private int[] shadowOrder = new int[6] { 0, 5, 4, 3, 2, 1 };
 	private Vector3[] defPos = new Vector3[6];
+	private Vector3[] shadPos = new Vector3[6];
+
 	private int firstObj;
 	private int secondObj;
 	private bool itemDragged = false;
 
-	private int[] matrOrder = new int[6]  { 0, 1, 2, 3, 4, 5 };
-	private int[] shadowOrder = new int[6] { 0, 5, 4, 3, 2, 1 };
+
 
 	void Start () 
 	{
+		//image0 is invisible image just to fill slot and start main array from 1, not 0
 		image = new GameObject[6]  {image0, image1, image2, image3, image4, image5 };
+		shadow = new GameObject[6]  {image0, shadow1, shadow2, shadow3, shadow4, shadow5 };
 		getImagePos ();
+		swapShadowOrder ();
 	}
 	
 
@@ -63,6 +75,7 @@ public class UIManager : MonoBehaviour {
 		}
 
 		matchCheck ();
+
 	}
 
 	//compare MousePos with DefPos and return number of DefPos if any nearby
@@ -96,6 +109,13 @@ public class UIManager : MonoBehaviour {
 		defPos[3] = image[3].transform.position;
 		defPos[4] = image[4].transform.position;
 		defPos[5] = image[5].transform.position;
+
+		shadPos[0] = shadow[0].transform.position;
+		shadPos[1] = shadow[1].transform.position;
+		shadPos[2] = shadow[2].transform.position;
+		shadPos[3] = shadow[3].transform.position;
+		shadPos[4] = shadow[4].transform.position;
+		shadPos[5] = shadow[5].transform.position;
 	}
 
 	void swapPoses(int v1, int v2)
@@ -107,6 +127,33 @@ public class UIManager : MonoBehaviour {
 		matrOrder[0] = matrOrder[v1];
 		matrOrder[v1] = matrOrder[v2];
 		matrOrder[v2] = matrOrder[0];
+	}
+
+	void swapShadowOrder ()
+	{
+		for (int i = 0; i < 10; i++)
+		{
+			int itemToSwap = Random.Range (1 , 6);
+			int itemToSwapWith = Random.Range (1 , 6);
+
+			shadPos [0] = shadPos[itemToSwap];
+			shadPos [itemToSwap] = shadPos[itemToSwapWith];
+			shadPos [itemToSwapWith] = shadPos[0];
+
+			// order must be counted from other side AND I DONT KNOW WHY
+			itemToSwap = 6 - itemToSwap;
+			itemToSwapWith = 6 - itemToSwapWith;
+
+			shadowOrder [0] = shadowOrder[itemToSwap];
+			shadowOrder [itemToSwap] = shadowOrder[itemToSwapWith];
+			shadowOrder [itemToSwapWith] = shadowOrder[0];
+		}
+		shadow[1].transform.position = Vector3.MoveTowards ( shadow[1].transform.position, shadPos[1], 1000f);
+		shadow[2].transform.position = Vector3.MoveTowards ( shadow[2].transform.position, shadPos[2], 1000f);
+		shadow[3].transform.position = Vector3.MoveTowards ( shadow[3].transform.position, shadPos[3], 1000f);
+		shadow[4].transform.position = Vector3.MoveTowards ( shadow[4].transform.position, shadPos[4], 1000f);
+		shadow[5].transform.position = Vector3.MoveTowards ( shadow[5].transform.position, shadPos[5], 1000f);
+
 	}
 
 	void matchCheck ()
